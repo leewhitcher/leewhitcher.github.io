@@ -487,11 +487,19 @@ dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');co
 function loadDemo(){
   fetch('PER3_20x13E.dat')
     .then(r => {
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status} — file not found`);
       return r.text();
     })
-    .then(text => loadFileText(text))
-    .catch(err => alert(`Could not load PER3_20x13E.dat — make sure it is in the same folder as this HTML file.\n\n(${err})`));
+    .then(text => {
+      const parsed = parseAPC(text);
+      if (!parsed.rpms.length) {
+        // Show first 300 chars so we can see what was actually fetched
+        alert(`File fetched but no RPM data parsed.\n\nFirst 300 chars of file:\n\n${text.slice(0,300)}`);
+        return;
+      }
+      loadFileText(text);
+    })
+    .catch(err => alert(`Fetch failed: ${err}`));
 }
 </script>
 </body>
