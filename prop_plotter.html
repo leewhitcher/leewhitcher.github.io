@@ -484,21 +484,14 @@ dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');co
   el.addEventListener('keydown',e=>{if(e.key==='Enter'&&rawData)render();});
 });
 
-function loadDemo(){loadFileText(makeDemo());}
-function makeDemo(){
-  const D=.508,rho=1.225,rpmList=[2000,3000,4000,5000,6000,7000,8000,9000,10000];
-  let out='APC 20x13E (Demo)\n\n';
-  rpmList.forEach(rpm=>{
-    out+=`PROP RPM = ${rpm}\n J          CT          CP         ETA         PWR(W)      THR(N)\n`;
-    const n=rpm/60;
-    for(let j=0;j<=.85;j=Math.round((j+.05)*100)/100){
-      const CT=Math.max(0,.115-.09*j-.03*j*j),CP=Math.max(.002,.055-.02*j+.015*j*j);
-      const PWR=CP*rho*Math.pow(n,3)*Math.pow(D,5),THR=CT*rho*Math.pow(n,2)*Math.pow(D,4);
-      out+=` ${j.toFixed(3)}       ${CT.toFixed(5)}     ${CP.toFixed(5)}     ${Math.min(.95,CT*j/CP||0).toFixed(4)}     ${PWR.toFixed(3)}       ${THR.toFixed(4)}\n`;
-    }
-    out+='\n';
-  });
-  return out;
+function loadDemo(){
+  fetch('PER3_20x13E.dat')
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.text();
+    })
+    .then(text => loadFileText(text))
+    .catch(err => alert(`Could not load PER3_20x13E.dat — make sure it is in the same folder as this HTML file.\n\n(${err})`));
 }
 </script>
 </body>
